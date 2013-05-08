@@ -97,7 +97,7 @@ class BackendEventsModel
 		$ids = (array) $ids;
 
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// delete records
 		$db->delete('events', 'id IN (' . implode(',', $ids) . ') AND language = ?', array(BL::getWorkingLanguage()));
@@ -126,7 +126,7 @@ class BackendEventsModel
 		$id = (int) $id;
 
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get item
 		$item = self::getCategory($id);
@@ -162,7 +162,7 @@ class BackendEventsModel
 		$ids = (array) $ids;
 
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get ids
 		$itemIds = (array) $db->getColumn('SELECT i.event_id
@@ -185,7 +185,7 @@ class BackendEventsModel
 	public static function deleteSpamComments()
 	{
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get ids
 		$itemIds = (array) $db->getColumn('SELECT i.event_id
@@ -208,7 +208,7 @@ class BackendEventsModel
 	public static function deleteSpamSubscriptions()
 	{
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get ids
 		$itemIds = (array) $db->getColumn('SELECT i.event_id
@@ -236,7 +236,7 @@ class BackendEventsModel
 		$ids = (array) $ids;
 
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get ids
 		$itemIds = (array) $db->getColumn('SELECT i.event_id
@@ -261,7 +261,7 @@ class BackendEventsModel
 	 */
 	public static function exists($id)
 	{
-		return (bool) BackendModel::getDB()->getVar('SELECT i.id
+		return (bool) BackendModel::getContainer()->get('database')->getVar('SELECT i.id
 														FROM events AS i
 														WHERE i.id = ? AND i.language = ?',
 														array((int) $id, BL::getWorkingLanguage()));
@@ -275,7 +275,7 @@ class BackendEventsModel
 	 */
 	public static function existsCategory($id)
 	{
-		return (bool) BackendModel::getDB()->getVar('SELECT COUNT(id)
+		return (bool) BackendModel::getContainer()->get('database')->getVar('SELECT COUNT(id)
 														FROM events_categories AS i
 														WHERE i.id = ? AND i.language = ?',
 														array((int) $id, BL::getWorkingLanguage()));
@@ -289,7 +289,7 @@ class BackendEventsModel
 	 */
 	public static function existsComment($id)
 	{
-		return (bool) BackendModel::getDB()->getVar('SELECT COUNT(id)
+		return (bool) BackendModel::getContainer()->get('database')->getVar('SELECT COUNT(id)
 														FROM events_comments AS i
 														WHERE i.id = ? AND i.language = ?',
 														array((int) $id, BL::getWorkingLanguage()));
@@ -303,7 +303,7 @@ class BackendEventsModel
 	 */
 	public static function existsSubscription($id)
 	{
-		return (bool) BackendModel::getDB()->getVar('SELECT COUNT(id)
+		return (bool) BackendModel::getContainer()->get('database')->getVar('SELECT COUNT(id)
 														FROM events_subscriptions AS i
 														WHERE i.id = ? AND i.language = ?',
 														array((int) $id, BL::getWorkingLanguage()));
@@ -317,7 +317,7 @@ class BackendEventsModel
 	 */
 	public static function get($id)
 	{
-		$data = (array) BackendModel::getDB()->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.starts_on) AS starts_on, UNIX_TIMESTAMP(i.ends_on) AS ends_on, UNIX_TIMESTAMP(i.publish_on) AS publish_on, UNIX_TIMESTAMP(i.created_on) AS created_on, UNIX_TIMESTAMP(i.edited_on) AS edited_on,
+		$data = (array) BackendModel::getContainer()->get('database')->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.starts_on) AS starts_on, UNIX_TIMESTAMP(i.ends_on) AS ends_on, UNIX_TIMESTAMP(i.publish_on) AS publish_on, UNIX_TIMESTAMP(i.created_on) AS created_on, UNIX_TIMESTAMP(i.edited_on) AS edited_on,
 															m.url
 															FROM events AS i
 															INNER JOIN meta AS m ON m.id = i.meta_id
@@ -351,7 +351,7 @@ class BackendEventsModel
 		if($status === null)
 		{
 			// get data and return it
-			return (array) BackendModel::getDB()->getRecords('SELECT i.id, UNIX_TIMESTAMP(i.created_on) AS created_on, i.author, i.email, i.website, i.text, i.type, i.status,
+			return (array) BackendModel::getContainer()->get('database')->getRecords('SELECT i.id, UNIX_TIMESTAMP(i.created_on) AS created_on, i.author, i.email, i.website, i.text, i.type, i.status,
 																p.id AS event_id, p.title AS event_title, m.url AS event_url, p.language AS event_language
 																FROM events_comments AS i
 																INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
@@ -363,7 +363,7 @@ class BackendEventsModel
 		}
 
 		// get data and return it
-		return (array) BackendModel::getDB()->getRecords('SELECT i.id, UNIX_TIMESTAMP(i.created_on) AS created_on, i.author, i.email, i.website, i.text, i.type, i.status,
+		return (array) BackendModel::getContainer()->get('database')->getRecords('SELECT i.id, UNIX_TIMESTAMP(i.created_on) AS created_on, i.author, i.email, i.website, i.text, i.type, i.status,
 															p.id AS event_id, p.title AS event_title, m.url AS event_url, p.language AS event_language
 															FROM events_comments AS i
 															INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
@@ -383,7 +383,7 @@ class BackendEventsModel
 	public static function getByTag($tagId)
 	{
 		// get the items
-		$items = (array) BackendModel::getDB()->getRecords('SELECT i.id AS url, i.title AS name, mt.module
+		$items = (array) BackendModel::getContainer()->get('database')->getRecords('SELECT i.id AS url, i.title AS name, mt.module
 															FROM modules_tags AS mt
 															INNER JOIN tags AS t ON mt.tag_id = t.id
 															INNER JOIN events AS i ON mt.other_id = i.id
@@ -405,7 +405,7 @@ class BackendEventsModel
 	public static function getCategories()
 	{
 		// get records and return them
-		$categories = (array) BackendModel::getDB()->getPairs('SELECT i.id, i.title
+		$categories = (array) BackendModel::getContainer()->get('database')->getPairs('SELECT i.id, i.title
 																FROM events_categories AS i
 																WHERE i.language = ?', array(BL::getWorkingLanguage()));
 
@@ -452,7 +452,7 @@ class BackendEventsModel
 	 */
 	public static function getCategory($id)
 	{
-		return (array) BackendModel::getDB()->getRecord('SELECT i.*
+		return (array) BackendModel::getContainer()->get('database')->getRecord('SELECT i.*
 															FROM events_categories AS i
 															WHERE i.id = ? AND i.language = ?',
 															array((int) $id, BL::getWorkingLanguage()));
@@ -472,7 +472,7 @@ class BackendEventsModel
 		$language = ($language !== null) ? (string) $language : BackendLanguage::getWorkingLanguage();
 
 		// exists?
-		return (int) BackendModel::getDB()->getVar('SELECT i.id
+		return (int) BackendModel::getContainer()->get('database')->getVar('SELECT i.id
 													FROM events_categories AS i
 													WHERE i.title = ? AND i.language = ?',
 													array($title, $language));
@@ -486,7 +486,7 @@ class BackendEventsModel
 	 */
 	public static function getComment($id)
 	{
-		return (array) BackendModel::getDB()->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.created_on) AS created_on,
+		return (array) BackendModel::getContainer()->get('database')->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.created_on) AS created_on,
 															p.id AS event_id, p.title AS event_title, m.url AS event_url
 															FROM events_comments AS i
 															INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
@@ -504,7 +504,7 @@ class BackendEventsModel
 	 */
 	public static function getComments(array $ids)
 	{
-		return (array) BackendModel::getDB()->getRecords('SELECT *
+		return (array) BackendModel::getContainer()->get('database')->getRecords('SELECT *
 															FROM events_comments AS i
 															WHERE i.id IN (' . implode(',', $ids) . ')');
 	}
@@ -516,7 +516,7 @@ class BackendEventsModel
 	 */
 	public static function getCommentStatusCount()
 	{
-		return (array) BackendModel::getDB()->getPairs('SELECT i.status, COUNT(i.id)
+		return (array) BackendModel::getContainer()->get('database')->getPairs('SELECT i.status, COUNT(i.id)
 															FROM events_comments AS i
 															WHERE i.language = ?
 															GROUP BY i.status',
@@ -533,7 +533,7 @@ class BackendEventsModel
 	public static function getLatestComments($status, $limit = 10)
 	{
 		// get the comments (order by id, this is faster then on date, the higher the id, the more recent
-		$comments = (array) BackendModel::getDB()->getRecords('SELECT i.id, i.author, i.text, UNIX_TIMESTAMP(i.created_on) AS created_in,
+		$comments = (array) BackendModel::getContainer()->get('database')->getRecords('SELECT i.id, i.author, i.text, UNIX_TIMESTAMP(i.created_on) AS created_in,
 																	p.title, p.language, m.url
 																FROM events_comments AS i
 																INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
@@ -561,7 +561,7 @@ class BackendEventsModel
 	 */
 	public static function getMaximumId()
 	{
-		return (int) BackendModel::getDB()->getVar('SELECT MAX(id) FROM events LIMIT 1');
+		return (int) BackendModel::getContainer()->get('database')->getVar('SELECT MAX(id) FROM events LIMIT 1');
 	}
 
 	/**
@@ -573,7 +573,7 @@ class BackendEventsModel
 	 */
 	public static function getRevision($id, $revisionId)
 	{
-		return (array) BackendModel::getDB()->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.publish_on) AS publish_on, UNIX_TIMESTAMP(i.created_on) AS created_on, UNIX_TIMESTAMP(i.edited_on) AS edited_on, m.url
+		return (array) BackendModel::getContainer()->get('database')->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.publish_on) AS publish_on, UNIX_TIMESTAMP(i.created_on) AS created_on, UNIX_TIMESTAMP(i.edited_on) AS edited_on, m.url
 															FROM events AS i
 															INNER JOIN meta AS m ON m.id = i.meta_id
 															WHERE i.id = ? AND i.revision_id = ?',
@@ -588,7 +588,7 @@ class BackendEventsModel
 	 */
 	public static function getSubscription($id)
 	{
-		return (array) BackendModel::getDB()->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.created_on) AS created_on,
+		return (array) BackendModel::getContainer()->get('database')->getRecord('SELECT i.*, UNIX_TIMESTAMP(i.created_on) AS created_on,
 															p.id AS event_id, p.title AS event_title, m.url AS event_url
 															FROM events_subscriptions AS i
 															INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
@@ -611,7 +611,7 @@ class BackendEventsModel
 		$URL = SpoonFilter::urlise((string) $URL);
 
 		// get db
-		$db = BackendModel::getDB();
+		$db = BackendModel::getContainer()->get('database');
 
 		// new item
 		if($id === null)
@@ -672,7 +672,7 @@ class BackendEventsModel
 		$URL = SpoonFilter::urlise((string) $URL);
 
 		// get db
-		$db = BackendModel::getDB();
+		$db = BackendModel::getContainer()->get('database');
 
 		// new category
 		if($id === null)
@@ -729,7 +729,7 @@ class BackendEventsModel
 	public static function insert(array $item)
 	{
 		// insert and return the new revision id
-		$item['revision_id'] = BackendModel::getDB(true)->insert('events', $item);
+		$item['revision_id'] = BackendModel::getContainer()->get('database')->insert('events', $item);
 
 		// invalidate the cache for events
 		BackendModel::invalidateFrontendCache('events', BL::getWorkingLanguage());
@@ -748,7 +748,7 @@ class BackendEventsModel
 	public static function insertCategory(array $item, $meta = null)
 	{
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// meta given?
 		if($meta !== null) $item['meta_id'] = $db->insert('meta', $meta);
@@ -778,7 +778,7 @@ class BackendEventsModel
 		$ids = array_unique($ids);
 
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get counts
 		$commentCounts = (array) $db->getPairs('SELECT i.event_id, COUNT(i.id) AS comment_count
@@ -816,7 +816,7 @@ class BackendEventsModel
 		$ids = array_unique($ids);
 
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// get counts
 		$subscriptionsCounts = (array) $db->getPairs('SELECT i.event_id, COUNT(i.id) AS subscription_count
@@ -851,13 +851,13 @@ class BackendEventsModel
 		if($item['status'] == 'active')
 		{
 			// archive all older active versions
-			BackendModel::getDB(true)->update('events', array('status' => 'archived'), 'id = ? AND status = ? AND language = ?', array($item['id'], $item['status'], BL::getWorkingLanguage()));
+			BackendModel::getContainer()->get('database')->update('events', array('status' => 'archived'), 'id = ? AND status = ? AND language = ?', array($item['id'], $item['status'], BL::getWorkingLanguage()));
 
 			// get the record of the exact item we're editing
 			$revision = self::getRevision($item['id'], $item['revision_id']);
 
 			// if it used to be a draft that we're now publishing, remove drafts
-			if($revision['status'] == 'draft') BackendModel::getDB(true)->delete('events', 'id = ? AND status = ?', array($item['id'], $revision['status']));
+			if($revision['status'] == 'draft') BackendModel::getContainer()->get('database')->delete('events', 'id = ? AND status = ?', array($item['id'], $revision['status']));
 		}
 
 		// don't want revision id
@@ -870,7 +870,7 @@ class BackendEventsModel
 		$archiveType = ($item['status'] == 'active' ? 'archived' : $item['status']);
 
 		// get revision-ids for items to keep
-		$revisionIdsToKeep = (array) BackendModel::getDB()->getColumn('SELECT i.revision_id
+		$revisionIdsToKeep = (array) BackendModel::getContainer()->get('database')->getColumn('SELECT i.revision_id
 																		 FROM events AS i
 																		 WHERE i.id = ? AND i.status = ? AND i.language = ?
 																		 ORDER BY i.edited_on DESC
@@ -878,10 +878,10 @@ class BackendEventsModel
 																		 array($item['id'], $archiveType, BL::getWorkingLanguage(), $rowsToKeep));
 
 		// delete other revisions
-		if(!empty($revisionIdsToKeep)) BackendModel::getDB(true)->delete('events', 'id = ? AND status = ? AND language = ? AND revision_id NOT IN (' . implode(', ', $revisionIdsToKeep) . ')', array($item['id'], BL::getWorkingLanguage(), $archiveType));
+		if(!empty($revisionIdsToKeep)) BackendModel::getContainer()->get('database')->delete('events', 'id = ? AND status = ? AND language = ? AND revision_id NOT IN (' . implode(', ', $revisionIdsToKeep) . ')', array($item['id'], BL::getWorkingLanguage(), $archiveType));
 
 		// insert new version
-		$item['revision_id'] = BackendModel::getDB(true)->insert('events', $item);
+		$item['revision_id'] = BackendModel::getContainer()->get('database')->insert('events', $item);
 
 		// invalidate the cache for events
 		BackendModel::invalidateFrontendCache('events', BL::getWorkingLanguage());
@@ -900,7 +900,7 @@ class BackendEventsModel
 	public static function updateCategory(array $item, $meta = null)
 	{
 		// get db
-		$db = BackendModel::getDB(true);
+		$db = BackendModel::getContainer()->get('database');
 
 		// update category
 		$updated = $db->update('events_categories', $item, 'id = ?', array((int) $item['id']));
@@ -930,7 +930,7 @@ class BackendEventsModel
 	 */
 	public static function updateComment(array $item)
 	{
-		return BackendModel::getDB(true)->update('events_comments', $item, 'id = ?', array((int) $item['id']));
+		return BackendModel::getContainer()->get('database')->update('events_comments', $item, 'id = ?', array((int) $item['id']));
 	}
 
 	/**
@@ -945,12 +945,12 @@ class BackendEventsModel
 		$ids = (array) $ids;
 
 		// get ids
-		$itemIds = (array) BackendModel::getDB()->getColumn('SELECT i.event_id
+		$itemIds = (array) BackendModel::getContainer()->get('database')->getColumn('SELECT i.event_id
 																FROM events_comments AS i
 																WHERE i.id IN (' . implode(',', $ids) . ')');
 
 		// update record
-		BackendModel::getDB(true)->execute('UPDATE events_comments
+		BackendModel::getContainer()->get('database')->execute('UPDATE events_comments
 											SET status = ?
 											WHERE id IN (' . implode(',', $ids) . ')',
 											array((string) $status));
@@ -970,7 +970,7 @@ class BackendEventsModel
 	 */
 	public static function updateSubscription(array $item)
 	{
-		return BackendModel::getDB(true)->update('events_comments', $item, 'id = ?', array((int) $item['id']));
+		return BackendModel::getContainer()->get('database')->update('events_comments', $item, 'id = ?', array((int) $item['id']));
 	}
 
 	/**
@@ -985,12 +985,12 @@ class BackendEventsModel
 		$ids = (array) $ids;
 
 		// get ids
-		$itemIds = (array) BackendModel::getDB()->getColumn('SELECT i.event_id
+		$itemIds = (array) BackendModel::getContainer()->get('database')->getColumn('SELECT i.event_id
 																FROM events_subscriptions AS i
 																WHERE i.id IN (' . implode(',', $ids) . ')');
 
 		// update record
-		BackendModel::getDB(true)->execute('UPDATE events_subscriptions
+		BackendModel::getContainer()->get('database')->execute('UPDATE events_subscriptions
 											SET status = ?
 											WHERE id IN (' . implode(',', $ids) . ')',
 											array((string) $status));

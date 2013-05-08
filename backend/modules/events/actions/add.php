@@ -47,7 +47,6 @@ class BackendEventsAdd extends BackendBaseActionAdd
 		$this->frm->addTime('starts_on_time', null);
 		$this->frm->addDate('ends_on_date', '');
 		$this->frm->addTime('ends_on_time', '');
-		$this->frm->addText('location');
 		$this->frm->addEditor('text');
 		$this->frm->addImage('image');
 		$this->frm->addEditor('introduction');
@@ -128,7 +127,6 @@ class BackendEventsAdd extends BackendBaseActionAdd
 				$item['user_id'] = $this->frm->getField('user_id')->getValue();
 				$item['language'] = BL::getWorkingLanguage();
 				$item['title'] = $this->frm->getField('title')->getValue();
-				$item['location'] = $this->frm->getField('location')->getValue();
 				$item['starts_on'] = BackendModel::getUTCDate(null, BackendModel::getUTCTimestamp($this->frm->getField('starts_on_date'), $this->frm->getField('starts_on_time')));
 				$item['ends_on'] = ($this->frm->getField('ends_on_date')->isFilled() || $this->frm->getField('ends_on_time')->isFilled()) ? BackendModel::getUTCDate(null, BackendModel::getUTCTimestamp($this->frm->getField('ends_on_date'), $this->frm->getField('ends_on_time'))) : null;
 				$item['introduction'] = $this->frm->getField('introduction')->getValue();

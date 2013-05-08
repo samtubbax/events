@@ -13,7 +13,7 @@ class BackendEventsExportRegistrations extends BackendBaseAction
 		// does the item exist
 		if($id !== null)
 		{
-			$subscriptions = (array) BackendModel::getDB()->getRecords('SELECT author, email, created_on FROM events_subscriptions WHERE status="published" AND event_id = ?', $id);
+			$subscriptions = (array) BackendModel::getContainer()->get('database')->getRecords('SELECT author, email, created_on FROM events_subscriptions WHERE status="published" AND event_id = ?', $id);
 
 			$filename = 'subscriptions_' . date('d-m-Y') . '_' . $id . '.csv';
 			SpoonFileCSV::arrayToFile(FRONTEND_FILES_PATH . '/subscriptions/' . $filename, $subscriptions);

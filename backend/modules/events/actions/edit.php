@@ -140,7 +140,6 @@ class BackendEventsEdit extends BackendBaseActionEdit
 		$this->frm->addImage('image');
 		$this->frm->addCheckbox('remove_image');
 		$this->frm->addEditor('introduction', $this->record['introduction']);
-		$this->frm->addText('location', $this->record['location']);
 		$this->frm->addRadiobutton('hidden', $rbtHiddenValues, $this->record['hidden']);
 		$this->frm->addCheckbox('allow_subscriptions', ($this->record['allow_subscriptions'] === 'Y'));
 		$this->frm->addText('max_subscriptions', ($this->record['max_subscriptions'] != null) ? $this->record['max_subscriptions'] : '');
@@ -252,7 +251,6 @@ class BackendEventsEdit extends BackendBaseActionEdit
 				$item['category_id'] = $this->frm->getField('category_id')->getValue();
 				$item['user_id'] = $this->frm->getField('user_id')->getValue();
 				$item['language'] = BL::getWorkingLanguage();
-				$item['location'] = $this->frm->getField('location')->getValue();
 				$item['title'] = $this->frm->getField('title')->getValue();
 				$item['starts_on'] = BackendModel::getUTCDate(null, BackendModel::getUTCTimestamp($this->frm->getField('starts_on_date'), $this->frm->getField('starts_on_time')));
 				$item['ends_on'] = ($this->frm->getField('ends_on_date')->isFilled() || $this->frm->getField('ends_on_time')->isFilled()) ? BackendModel::getUTCDate(null, BackendModel::getUTCTimestamp($this->frm->getField('ends_on_date'), $this->frm->getField('ends_on_time'))) : null;

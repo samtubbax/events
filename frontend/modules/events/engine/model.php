@@ -22,7 +22,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function get($URL)
 	{
-		$return = (array) FrontendModel::getDB()->getRecord('SELECT i.id, i.revision_id, i.language, i.title, UNIX_TIMESTAMP(i.starts_on) AS starts_on, UNIX_TIMESTAMP(i.ends_on) AS ends_on, i.introduction, i.text, i.num_comments AS comments_count, i.location, i.image,
+		$return = (array) FrontendModel::getContainer()->get('database')->getRecord('SELECT i.id, i.revision_id, i.language, i.title, UNIX_TIMESTAMP(i.starts_on) AS starts_on, UNIX_TIMESTAMP(i.ends_on) AS ends_on, i.introduction, i.text, i.num_comments AS comments_count, i.image,
 															c.title AS category_title, m2.url AS category_url,
 															UNIX_TIMESTAMP(i.publish_on) AS publish_on, i.user_id,
 															UNIX_TIMESTAMP(i.created_on) AS created_on, UNIX_TIMESTAMP(i.edited_on) AS edited_on,
@@ -79,7 +79,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function getAll($limit = 10, $offset = 0)
 	{
-		$ids = (array) FrontendModel::getDB()->getColumn('SELECT i.id
+		$ids = (array) FrontendModel::getContainer()->get('database')->getColumn('SELECT i.id
 															FROM events AS i
 															INNER JOIN meta AS m ON i.meta_id = m.id
 															WHERE i.status = ? AND i.language = ? AND i.hidden = ? AND i.publish_on <= ? AND
@@ -103,7 +103,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function getAllCategories()
 	{
-		return (array) FrontendModel::getDB()->getRecords('SELECT c.id, c.title AS label, m.url, COUNT(c.id) AS total
+		return (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT c.id, c.title AS label, m.url, COUNT(c.id) AS total
 															FROM events_categories AS c
 															INNER JOIN meta AS m ON c.meta_id = m.id
 															INNER JOIN events AS i ON c.id = i.category_id AND c.language = i.language
@@ -121,7 +121,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function getAllComments($limit = 10, $offset = 0)
 	{
-		return (array) FrontendModel::getDB()->getRecords('SELECT i.id, UNIX_TIMESTAMP(i.created_on) AS created_on, i.author, i.text,
+		return (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT i.id, UNIX_TIMESTAMP(i.created_on) AS created_on, i.author, i.text,
 															p.id AS event_id, p.title AS event_title, m.url AS event_url
 															FROM events_comments AS i
 															INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
@@ -140,7 +140,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function getAllCount()
 	{
-		return (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id) AS count
+		return (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id) AS count
 														FROM events AS i
 														WHERE i.status = ? AND i.language = ? AND i.hidden = ? AND i.publish_on <= ? AND
 															((i.ends_on IS NOT NULL AND i.ends_on > ?) || (i.starts_on > ?)) ',
@@ -158,7 +158,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function getAllForCategory($categoryURL, $limit = 10, $offset = 0)
 	{
 		// get the items
-		$ids = (array) FrontendModel::getDB()->getColumn('SELECT i.id
+		$ids = (array) FrontendModel::getContainer()->get('database')->getColumn('SELECT i.id
 																FROM events AS i
 																INNER JOIN events_categories AS c ON i.category_id = c.id
 																INNER JOIN meta AS m ON i.meta_id = m.id
@@ -183,7 +183,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function getAllForCategoryCount($URL)
 	{
-		return (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id) AS count
+		return (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id) AS count
 														FROM events AS i
 														INNER JOIN events_categories AS c ON i.category_id = c.id
 														INNER JOIN meta AS m ON c.meta_id = m.id
@@ -209,7 +209,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		$offset = (int) $offset;
 
 		// get the items
-		$ids = (array) FrontendModel::getDB()->getColumn('SELECT i.id
+		$ids = (array) FrontendModel::getContainer()->get('database')->getColumn('SELECT i.id
 															FROM events AS i
 															INNER JOIN meta AS m ON i.meta_id = m.id
 															WHERE i.status = ? AND i.language = ? AND i.hidden = ? AND i.publish_on <= ? AND i.starts_on BETWEEN ? AND ?
@@ -237,7 +237,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		$end = (int) $end;
 
 		// return the number of items
-		return (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id)
+		return (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id)
 														FROM events AS i
 														WHERE i.status = ? AND i.language = ? AND i.hidden = ? AND i.publish_on <= ? AND i.starts_on BETWEEN ? AND ?',
 														array('active', FRONTEND_LANGUAGE, 'N', FrontendModel::getUTCDate('Y-m-d H:i') . ':00', FrontendModel::getUTCDate('Y-m-d H:i:s', $start), FrontendModel::getUTCDate('Y-m-d H:i:s', $end)));
@@ -251,7 +251,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function getArchiveNumbers()
 	{
 		// grab stats
-		$numbers = FrontendModel::getDB()->getPairs('SELECT DATE_FORMAT(i.starts_on, "%Y%m") AS month, COUNT(i.id)
+		$numbers = FrontendModel::getContainer()->get('database')->getPairs('SELECT DATE_FORMAT(i.starts_on, "%Y%m") AS month, COUNT(i.id)
 														FROM events AS i
 														INNER JOIN meta AS m ON i.meta_id = m.id
 														WHERE i.status = ? AND i.language = ? AND i.hidden = ? AND i.publish_on <= ?
@@ -323,7 +323,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function getComments($id)
 	{
 		// get the comments
-		$comments = (array) FrontendModel::getDB()->getRecords('SELECT c.id, UNIX_TIMESTAMP(c.created_on) AS created_on, c.text, c.data,
+		$comments = (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT c.id, UNIX_TIMESTAMP(c.created_on) AS created_on, c.text, c.data,
 																c.author, c.email, c.website
 																FROM events_comments AS c
 																WHERE c.event_id = ? AND c.status = ? AND c.language = ?
@@ -346,7 +346,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 /*	public static function getDraft($URL, $draft)
 	{
-		return (array) FrontendModel::getDB()->getRecord('SELECT i.id, i.revision_id, i.language, i.title, i.introduction, i.text,
+		return (array) FrontendModel::getContainer()->get('database')->getRecord('SELECT i.id, i.revision_id, i.language, i.title, i.introduction, i.text,
 															c.title AS category_title, m2.url AS category_url,
 															UNIX_TIMESTAMP(i.publish_on) AS publish_on, i.user_id,
 															i.allow_comments,
@@ -373,7 +373,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function getForTags(array $ids)
 	{
 		// fetch items
-		$items = (array) FrontendModel::getDB()->getRecords('SELECT i.title, m.url
+		$items = (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT i.title, m.url
 																FROM events AS i
 																INNER JOIN meta AS m ON m.id = i.meta_id
 																WHERE i.status = ? AND i.hidden = ? AND i.revision_id IN (' . implode(',', $ids) . ')
@@ -422,7 +422,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		if(empty($ids)) return array();
 
 		// get items
-		$items = FrontendModel::getDB()->getRecords('SELECT i.id, i.revision_id, i.language, i.title, UNIX_TIMESTAMP(i.starts_on) AS starts_on, UNIX_TIMESTAMP(i.ends_on) AS ends_on, i.introduction, i.text, i.num_comments AS comments_count, i.user_id, i.location,
+		$items = FrontendModel::getContainer()->get('database')->getRecords('SELECT i.id, i.revision_id, i.language, i.title, UNIX_TIMESTAMP(i.starts_on) AS starts_on, UNIX_TIMESTAMP(i.ends_on) AS ends_on, i.introduction, i.text, i.num_comments AS comments_count, i.user_id,
 														c.title AS category_title, m2.url AS category_url,
 														UNIX_TIMESTAMP(i.publish_on) AS publish_on, i.user_id, i.allow_comments,
 														UNIX_TIMESTAMP(i.created_on) AS created_on, UNIX_TIMESTAMP(i.edited_on) AS edited_on,
@@ -498,7 +498,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		$id = (int) $id;
 
 		// get db
-		$db = FrontendModel::getDB();
+		$db = FrontendModel::getContainer()->get('database');
 
 		// get date for current item
 		$date = (string) $db->getVar('SELECT i.starts_on
@@ -549,7 +549,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		$return = array();
 
 		// get comments
-		$comments = (array) FrontendModel::getDB()->getRecords('SELECT c.id, c.author, c.website, c.email, UNIX_TIMESTAMP(c.created_on) AS created_on, c.text,
+		$comments = (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT c.id, c.author, c.website, c.email, UNIX_TIMESTAMP(c.created_on) AS created_on, c.text,
 																i.id AS event_id, i.title AS event_title,
 																m.url AS event_url
 																FROM events_comments AS c
@@ -603,7 +603,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		$link = FrontendNavigation::getURLForBlock('events', 'detail');
 
 		// get items
-		$items = (array) FrontendModel::getDB()->getRecords('SELECT i.id, i.title, m.url
+		$items = (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT i.id, i.title, m.url
 																FROM events_posts AS i
 																INNER JOIN meta AS m ON i.meta_id = m.id
 																WHERE i.status = ? AND i.language = ? AND i.hidden = ? AND i.publish_on <= ? AND i.id IN(' . implode(',', $relatedIDs) . ')
@@ -630,7 +630,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 /*	public static function getRevision($URL, $revision)
 	{
-		return (array) FrontendModel::getDB()->getRecord('SELECT i.id, i.revision_id, i.language, i.title, i.introduction, i.text,
+		return (array) FrontendModel::getContainer()->get('database')->getRecord('SELECT i.id, i.revision_id, i.language, i.title, i.introduction, i.text,
 															c.title AS category_title, m2.url AS category_url,
 															UNIX_TIMESTAMP(i.publish_on) AS publish_on, i.user_id,
 															i.allow_comments,
@@ -657,7 +657,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function getSubscriptions($id)
 	{
 		// get the subscriptions
-		$subscriptions = (array) FrontendModel::getDB()->getRecords('SELECT c.id, UNIX_TIMESTAMP(c.created_on) AS created_on, c.data,
+		$subscriptions = (array) FrontendModel::getContainer()->get('database')->getRecords('SELECT c.id, UNIX_TIMESTAMP(c.created_on) AS created_on, c.data,
 																c.author, c.email
 																FROM events_subscriptions AS c
 																WHERE c.event_id = ? AND c.status = ? AND c.language = ?
@@ -680,7 +680,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function insertComment(array $comment)
 	{
 		// get db
-		$db = FrontendModel::getDB(true);
+		$db = FrontendModel::getContainer()->get('database');
 
 		// insert comment
 		$comment['id'] = (int) $db->insert('events_comments', $comment);
@@ -689,7 +689,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		if($comment['status'] == 'published')
 		{
 			// num comments
-			$numComments = (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id) AS comment_count
+			$numComments = (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id) AS comment_count
 																	FROM events_comments AS i
 																	INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
 																	WHERE i.status = ? AND i.event_id = ? AND i.language = ? AND p.status = ?
@@ -713,7 +713,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function insertSubscription(array $subscription)
 	{
 		// get db
-		$db = FrontendModel::getDB(true);
+		$db = FrontendModel::getContainer()->get('database');
 
 		// insert comment
 		$subscription['id'] = (int) $db->insert('events_subscriptions', $subscription);
@@ -722,7 +722,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		if($subscription['status'] == 'published')
 		{
 			// num comments
-			$numSubscriptions = (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id) AS subscription_count
+			$numSubscriptions = (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id) AS subscription_count
 																	FROM events_subscriptions AS i
 																	INNER JOIN events AS p ON i.event_id = p.id AND i.language = p.language
 																	WHERE i.status = ? AND i.event_id = ? AND i.language = ? AND p.status = ?
@@ -746,7 +746,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	 */
 	public static function isModerated($author, $email)
 	{
-		return (bool) FrontendModel::getDB()->getVar('SELECT COUNT(c.id)
+		return (bool) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(c.id)
 														FROM events_comments AS c
 														WHERE c.status = ? AND c.author = ? AND c.email = ?',
 														array('published', (string) $author, (string) $email));
@@ -767,7 +767,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		else $alert = array('loc-key' => 'NEW_COMMENT');
 
 		// get count of unmoderated items
-		$badge = (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id)
+		$badge = (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id)
 														FROM events_comments AS i
 														WHERE i.status = ? AND i.language = ?
 														GROUP BY i.status',
@@ -836,7 +836,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 		else $alert = array('loc-key' => 'NEW_SUBSCRIPTION');
 
 		// get count of unmoderated items
-		$badge = (int) FrontendModel::getDB()->getVar('SELECT COUNT(i.id)
+		$badge = (int) FrontendModel::getContainer()->get('database')->getVar('SELECT COUNT(i.id)
 														FROM events_subscriptions AS i
 														WHERE i.status = ? AND i.language = ?
 														GROUP BY i.status',
@@ -900,7 +900,7 @@ class FrontendEventsModel implements FrontendTagsInterface
 	public static function searchEvents($query)
 	{
 		// get items
-		$items = (array) FrontendModel::getDB()->getColumn('SELECT i.id
+		$items = (array) FrontendModel::getContainer()->get('database')->getColumn('SELECT i.id
 																FROM events AS i
 																WHERE i.status = ? AND i.hidden = ? AND i.language = ? AND i.publish_on <= ? AND i.title LIKE ?',
 																array('active', 'N', FRONTEND_LANGUAGE, date('Y-m-d H:i') . ':00', '%' . $query . '%'));
